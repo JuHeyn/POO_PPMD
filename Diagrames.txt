@@ -1,0 +1,88 @@
+###################################################################################
+###################################### Classe ##################################### 
+###################################################################################
+
+@startuml
+
+Class Grille{
+Longueur : int
+Largeur : int
+Perdu : bool
+}
+
+Class Case {
+Position : (int, int)
+Bombe : bool
+Etat : etat (drapeau, découvert, cachée)
+---
+placer_drapeau()
+découvrir()
+nombre_voisins()
+}
+
+
+Grille "1" *-- Case
+
+@enduml
+
+###################################################################################
+##################################### Séquence #################################### 
+###################################################################################
+
+@startuml
+
+skinparam actorStyle awesome
+Actor Utilisateur
+
+== Initialisation ==
+
+Utilisateur -> Jeu : Commencer partie
+Jeu --> Utilisateur : Grille vide
+
+== Partie ==
+
+alt Révéler case
+   Utilisateur -> Jeu : Creuser la case
+   Jeu -> Case : Creuser
+   alt Pas de bombe
+      Case --> Jeu : Case révélée
+      Jeu -> Case : Bombe autour de la case
+   
+   else Bombe présente
+      Case --> Jeu : Explosion
+      Jeu --> Utilisateur : Fin de partie
+   end
+      
+
+else Placer drapeau
+   Utilisateur -> Jeu : Placer un drapeau sur la case
+   Jeu -> Case : Placer un drapeau
+
+end
+@enduml
+
+###################################################################################
+################################ Cas d'utilisation ################################ 
+###################################################################################
+
+@startuml
+
+left to right direction
+actor Joueur as j
+
+package Démineur {
+  usecase "Lancer une partie" as UC1
+  usecase "Poser un drapeau" as UC2
+  usecase "Creuser une case" as UC3
+
+}
+
+j --> UC1
+j --> UC2
+j --> UC3
+
+@enduml
+
+###################################################################################
+############################### Etats - Transitions ############################### 
+###################################################################################
