@@ -3,7 +3,9 @@ from Case import Case
 
 class Grille() :
 
-    def __init__(self, longueur, largeur, nbMines) :
+    def __init__(self, longueur, largeur, nbMines, ligne_depart, colonne_depart) :
+        if nbMines >= largeur * longueur - 9 :
+            raise Exception("La grille possède trop de mines")
         self.long = longueur
         self.larg = largeur
         self.mines = nbMines
@@ -11,11 +13,19 @@ class Grille() :
         self.grille = [[Case(l, c, False) for c in range(largeur)] for l in range(longueur)]
         minesRestantes = nbMines
 
+        environ = self.voisinage(ligne_depart,colonne_depart)
         while minesRestantes > 0 :
             l, c = randint(0, longueur-1), randint(0, largeur-1)
-            if not self[l,c].bombe :
+            if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligne_depart, colonne_depart):
                 self[l,c].bombe = True
                 minesRestantes -= 1 
+
+        self.voisinsGrille()
+        self.valeurVoisins()
+        for v in environ :
+            self.creuser(v)
+        self.creuser((ligne_depart, colonne_depart))
+
 
 
     def __getitem__(self, key):
@@ -23,23 +33,31 @@ class Grille() :
             try :
                 return self.grille[key]
             except IndexError :
-                print(f"ERREUR : La ligne recherchée n'existe pas : ligne d'indice {key} dans {self.larg} lignes")
+                raise IndexError(f"La ligne recherchée n'existe pas : ligne d'indice {key} dans {self.larg} lignes")
             
         elif type(key) == tuple and len(key) == 2 :
             try :
                 return self.grille[key[0]][key[1]]
             except IndexError :
-                print(f"ERREUR : La case recherchée n'existe pas : case d'indice {key} dans {self.long}x{self.larg}")
+                raise IndexError(f"La case recherchée n'existe pas : case d'indice {key} dans {self.long}x{self.larg}")
+
+        elif type(key) == Case :
+            return Case
 
 
     def __str__(self):
-        ligne = " " + "----" * self.larg + "-\n"
-        affichage = ligne + " | "
-        for l in self.grille :
-            for case in l :
-                affichage += str(case) + " | "
-            affichage += "\n" + ligne + " | "
-        return affichage[:-2]
+        ligne = "    " + "----" * self.larg + "-\n"
+        affichage = "    "
+        for j in range(self.larg) :
+            affichage += f" {" "*(3-len(str(j+1))) + str(j+1)}"
+
+        affichage += "\n" + ligne + "  1 | "
+        for i in range(self.long) :
+            for j in range(self.larg) :
+                affichage += str(self[i,j]) + " | "
+            affichage += "\n" + ligne + f"{" "*(3-len(str(i+2))) + str(i+2)} | "
+
+        return affichage[:-7]
 
 
     def voisinage(self, l, c) :
@@ -82,9 +100,38 @@ class Grille() :
             for case in l :
                 self.voisinsCase(case)
 
+    def valeurVoisins(self) :
+        for l in self.grille :
+            for case in l :
+                voisins = self.voisinage(case.ligne, case.colonne)
+                valeurs_0 = []
+                for v in voisins :
+                    if self[v].valeur == 0 :
+                        valeurs_0.append(v)
+                case.zeros = valeurs_0 
+
+    def placerDrapeau(self, case) :
+        return self[case].placerDrapeau()
+
+    def creuser(self, case) :
+        return self[case].creuser()
+
+    def reveler(self, perdu) :
+        if perdu : 
+            for l in self.grille :
+                for case in l :
+                    if case.etat == 0 :
+                        case.creuser()
+        else :
+            for l in self.grille :
+                for case in l :
+                    if case.etat == 0 :
+                        case.placerDrapeau()
+
+
 if __name__ == "__main__" :
 
-    g = Grille(5,15,60)
+    g = Grille(5,15,60, 1,1)
     g.voisinsGrille()
     g[3,3].placerDrapeau()
     g[4,4].decouvrir()

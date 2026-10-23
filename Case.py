@@ -6,11 +6,12 @@ class Case() :
         self.bombe = bombe
         self.etat = 0 # -1 = Creuse, 0 = intact, 1 = drapeau  
         self.valeur = 0
+        self.zeros = []
 
     def __str__(self):
         if self.bombe :
             self.valeur = "x"
-        dicoEtats = {-1 : str(self.valeur), 0 : " ", 1 : "⚐"}
+        dicoEtats = {-1 : f"\033[96m{self.valeur}\033[0m" if self.valeur != "x" else f"\033[91m{self.valeur}\033[0m", 0 : " ", 1 : "\033[93m⚐\033[0m"}
         return dicoEtats[self.etat]
 
     def placerDrapeau(self) :
@@ -19,15 +20,17 @@ class Case() :
         """
         if self.etat == 0 :
             self.etat = 1
+            return -1
         elif self.etat == 1 :
             self.etat = 0
+            return 1
 
 
-    def decouvrir(self) :
-        if self.bombe :
-            return False
-
+    def creuser(self) :
         self.etat = -1
+        if self.bombe :
+            return True
+
 
 
 
