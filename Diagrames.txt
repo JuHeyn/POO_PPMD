@@ -8,6 +8,10 @@ Class Grille{
 Longueur : int
 Largeur : int
 Perdu : bool
+---
+placer_drapeau(case)
+creuser(case)
+voisins(case)
 }
 
 Class Case {
@@ -33,13 +37,14 @@ Grille "1" *-- Case
 
 skinparam actorStyle awesome
 Actor Utilisateur
+hide footbox
 
-== Initialisation ==
+==Initialisation==
 
 Utilisateur -> Jeu : Commencer partie
 Jeu --> Utilisateur : Grille vide
 
-== Partie ==
+==Partie==
 
 alt Révéler case
    Utilisateur -> Jeu : Creuser la case
@@ -50,7 +55,7 @@ alt Révéler case
    
    else Bombe présente
       Case --> Jeu : Explosion
-      Jeu --> Utilisateur : Fin de partie
+      Jeu --> Utilisateur : Fin de partie, défaite
    end
       
 
@@ -59,6 +64,13 @@ else Placer drapeau
    Jeu -> Case : Placer un drapeau
 
 end
+
+==Fin==
+
+Jeu -> Jeu : Plus de mines
+Jeu --> Utilisateur : Fin de partie, victoire
+
+
 @enduml
 
 ###################################################################################
@@ -86,3 +98,22 @@ j --> UC3
 ###################################################################################
 ############################### Etats - Transitions ############################### 
 ###################################################################################
+
+@startuml
+hide empty description
+skinparam stateDiagramEdgeLabelStyle node
+skinparam ranksep 20
+
+[*] --> CaseChoisie
+CaseChoisie --> Drapeau : Déminer
+CaseChoisie --> Trou : Creuser
+Trou --> Explosion : Mine
+Trou --> NbMinesVoisines : Vide 
+
+state join_state <<join>>
+NbMinesVoisines -down-> join_state
+Drapeau -down-> join_state
+join_state -up-> CaseChoisie : Encore des mines
+join_state -down-> [*] : Plus de mines
+
+@enduml
