@@ -68,9 +68,9 @@ class Demineur() :
         print("Bienvenue dans cette partie de démineur !\nPour commencer, choisi une case ou creuser. Pour cela, chaque action se décompose en 3 :\n\t- Une lettre pour l'action : C pour creuser et D pour poser un drapeau\n\t- Un nombre pour la ligne à laquelle effectuer l'action\n\t- Un nombre pour la colonne à laquelle effectuer l'action\nPar exemple, 'C 12 5' creuse la case située à la 12eme ligne et 5eme colonne !\n")
         reponse = self.question(premier=True)
         self.grille = Grille(self.longueur, self.largeur, self.nbMines, reponse[1], reponse[2])
-        
+        self.caseCachees += -len(self.grille.voisinage(reponse[1], reponse[2])) - 1
 
-        while (not self.perdu) and (self.nbDrapeau != 0) and (self.caseCachees != self.nbDrapeau) :
+        while (not self.perdu) and (self.caseCachees != self.nbDrapeau) :
             print(self.grille)
             action, ligne, colonne = self.question()
 
@@ -90,20 +90,19 @@ class Demineur() :
                     self.nbDrapeau += self.grille.placerDrapeau((ligne, colonne))
 
         
+        self.grille.reveler()
+        print(self.grille)
 
         if self.perdu :
-            self.grille.reveler(True)
-            print(self.grille)
             print("\nDommage tu as perdu !\n\n")
 
         else :
-            self.grille.reveler(False)
-            print(self.grille)
+            
             print("\nFélicitation tu as gagné cette partie !\n\n")
 
 
 
 
 if __name__ == "__main__" :
-    d = Demineur(5,5,12)
+    d = Demineur(4,4,3)
     d.jouer()

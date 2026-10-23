@@ -114,19 +114,18 @@ class Grille() :
         return self[case].placerDrapeau()
 
     def creuser(self, case) :
-        return self[case].creuser()
+        etat = self[case].creuser()
+        if etat == True :
+            return True 
+        elif etat == False :
+            for v in [v for v in self.voisinage(*case) if self[v].etat ==0] :
+                self.creuser(v)
 
-    def reveler(self, perdu) :
-        if perdu : 
-            for l in self.grille :
-                for case in l :
-                    if case.etat == 0 :
-                        case.creuser()
-        else :
-            for l in self.grille :
-                for case in l :
-                    if case.etat == 0 :
-                        case.placerDrapeau()
+    def reveler(self) :
+        for l in self.grille :
+            for case in l :
+                if case.etat == 0 :
+                    case.creuser()
 
 
 if __name__ == "__main__" :
