@@ -3,7 +3,7 @@ from Case import Case
 
 class Grille() :
 
-    def __init__(self, longueur, largeur, nbMines, ligne_depart, colonne_depart) :
+    def __init__(self, longueur, largeur, nbMines, ligneDepart, colonneDepart) :
         if nbMines >= largeur * longueur - 9 :
             raise Exception("La grille possède trop de mines")
         self.long = longueur
@@ -13,10 +13,10 @@ class Grille() :
         self.grille = [[Case(l, c, False) for c in range(largeur)] for l in range(longueur)]
         minesRestantes = nbMines
 
-        environ = self.voisinage(ligne_depart,colonne_depart)
+        environ = self.voisinage(ligneDepart,colonneDepart)
         while minesRestantes > 0 :
             l, c = randint(0, longueur-1), randint(0, largeur-1)
-            if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligne_depart, colonne_depart):
+            if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligneDepart, colonneDepart):
                 self[l,c].bombe = True
                 minesRestantes -= 1 
 
@@ -24,8 +24,8 @@ class Grille() :
         self.valeurVoisins()
         for v in environ :
             self.creuser(v)
-        self.creuser((ligne_depart, colonne_depart))
-
+        self.creuser((ligneDepart, colonneDepart))
+        
 
 
     def __getitem__(self, key):
@@ -120,6 +120,7 @@ class Grille() :
         elif etat == False :
             for v in [v for v in self.voisinage(*case) if self[v].etat ==0] :
                 self.creuser(v)
+            return False
 
     def reveler(self) :
         for l in self.grille :
