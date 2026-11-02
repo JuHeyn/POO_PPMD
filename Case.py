@@ -1,18 +1,24 @@
 class Case() :
 
-    def __init__(self, ligne:int, colonne:int, bombe:bool) :
+    def __init__(self, ligne:int, colonne:int, bombe:bool, couleur = True) :
         self.ligne = ligne
         self.colonne = colonne
         self.bombe = bombe
         self.etat = 0 # -1 = Creuse, 0 = intact, 1 = drapeau  
         self.valeur = 0
         self.zeros = []
+        self.couleur = couleur
 
     def __str__(self):
         if self.bombe :
             self.valeur = "x"
-        dicoCouleurs = {"x" : "\u001b[38;5;1m", 0 : "\u001b[38;5;118m", 1 : "\u001b[38;5;191m", 2 : "\u001b[38;5;221m", 3 : "\u001b[38;5;214m", 4 : "\u001b[38;5;208m", 5 : "\u001b[38;5;202m", 6 : "\u001b[38;5;166m", 7 : "\u001b[38;5;196m", 8 : "\u001b[38;5;160m"}
-        dicoEtats = {-1 : f"{dicoCouleurs[self.valeur]}{self.valeur}\033[0m", 0 : " ", 1 : "\033[96m⚐\033[0m"}
+            
+        if self.couleur :
+            dicoCouleurs = {"x" : "\u001b[38;5;1m", 0 : "\u001b[38;5;118m", 1 : "\u001b[38;5;191m", 2 : "\u001b[38;5;221m", 3 : "\u001b[38;5;214m", 4 : "\u001b[38;5;208m", 5 : "\u001b[38;5;202m", 6 : "\u001b[38;5;166m", 7 : "\u001b[38;5;196m", 8 : "\u001b[38;5;160m"}
+            dicoEtats = {-1 : f"{dicoCouleurs[self.valeur]}{self.valeur}\033[0m", 0 : " ", 1 : "\033[96m⚐\033[0m"}
+        else : 
+            dicoEtats = {-1 : f"{self.valeur}", 0 : " ", 1 : "⚐"}
+
         return dicoEtats[self.etat]
 
     def placerDrapeau(self) :

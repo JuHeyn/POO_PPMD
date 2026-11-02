@@ -3,30 +3,35 @@ from Case import Case
 
 class Grille() :
 
-    def __init__(self, longueur, largeur, nbMines, ligneDepart, colonneDepart) :
+    def __init__(self, longueur, largeur, nbMines, ligneDepart, colonneDepart, couleur = True) :
         if nbMines >= largeur * longueur - 9 :
             raise Exception("La grille possède trop de mines")
         self.long = longueur
         self.larg = largeur
         self.mines = nbMines
+        self.couleur = couleur
 
-        self.grille = [[Case(l, c, False) for c in range(largeur)] for l in range(longueur)]
+        self.grille = [[Case(l, c, False, self.couleur) for c in range(self.larg)] for l in range(self.long)]
         minesRestantes = nbMines
 
-        environ = self.voisinage(ligneDepart,colonneDepart)
-        while minesRestantes > 0 :
-            l, c = randint(0, longueur-1), randint(0, largeur-1)
-            if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligneDepart, colonneDepart):
-                self[l,c].bombe = True
-                minesRestantes -= 1 
+        if (ligneDepart, colonneDepart) == (-1, -1) :
+            pass
+        elif not (0 <= ligneDepart < self.long) or not (0 <= colonneDepart < self.larg) :
+            raise IndexError("La case de démarrage n'est pas dans la grille.")
+        else :
+            environ = self.voisinage(ligneDepart,colonneDepart)
+            while minesRestantes > 0 :
+                l, c = randint(0, self.long-1), randint(0, self.larg-1)
+                if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligneDepart, colonneDepart):
+                    self[l,c].bombe = True
+                    minesRestantes -= 1 
 
-        self.voisinsGrille()
-        self.valeurVoisins()
-        for v in environ :
-            self.creuser(v)
-        self.creuser((ligneDepart, colonneDepart))
+            self.voisinsGrille()
+            self.valeurVoisins()
+            for v in environ :
+                self.creuser(v)
+            self.creuser((ligneDepart, colonneDepart))
         
-
 
     def __getitem__(self, key):
         if type(key) == int :
@@ -58,7 +63,6 @@ class Grille() :
             affichage += "\n" + ligne + f"{" "*(3-len(str(i+2))) + str(i+2)} | "
 
         return affichage[:-7]
-
 
     def voisinage(self, l, c) :
         # Centre

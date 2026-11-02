@@ -1,12 +1,13 @@
 from Grille import Grille
 
 class Demineur() :
-    def __init__(self, longueur = -1, largeur = -1, nbMines = -1):
+    def __init__(self, longueur = -1, largeur = -1, nbMines = -1, couleur=True):
         self.longueur = longueur
         self.largeur = largeur
         self.nbMines = nbMines
         self.perdu = False
         self.nbDrapeau = nbMines
+        self.couleur = couleur
         
 
         if self.longueur == -1 :
@@ -18,20 +19,7 @@ class Demineur() :
 
         self.caseCachees = self.longueur * self.largeur
 
-        ligne = "    " + "----" * self.largeur + "-\n"
-        affichage = "    "
-        for j in range(self.largeur) :
-            affichage += f" {" "*(3-len(str(j+1))) + str(j+1)}"
-
-        affichage += "\n" + ligne + "  1 | "
-        for i in range(self.longueur) :
-            for j in range(self.largeur) :
-                affichage += "  | "
-            affichage += "\n" + ligne + f"{" "*(3-len(str(i+2))) + str(i+2)} | "
-        
-        
-
-        self.grille = affichage[:-7]
+        self.grille = Grille(self.longueur, self.largeur, 0, -1, -1, self.couleur)
 
     def question(self, premier = False) :
         reponse = input(f"Que souhaites tu faire ? (Action Ligne Colonne)   -   {self.nbDrapeau} drapeaux restants   -   {self.caseCachees} cases restantes\n\t").split()
@@ -76,32 +64,42 @@ class Demineur() :
                     compteurCasesRestantes += 1
         self.caseCachees = compteurCasesRestantes
 
+
+    def fin(self) :
+        return self.perdu or self.caseCachees == self.nbDrapeau
+
+
+    def creuser(self, ligne, colonne) :
+        explosion = self.grille.creuser((ligne, colonne))
+        if explosion : 
+            self.perdu = True
+
+    def drapeau(self, ligne, colonne) :
+        if self.nbDrapeau == 0 :
+            if self.grille[ligne, colonne].etat == 0 :
+                print("Plus aucun drapeau n'est disponible.")
+            else :
+                self.nbDrapeau += self.grille.placerDrapeau((ligne, colonne))
+        else : 
+            self.nbDrapeau += self.grille.placerDrapeau((ligne, colonne))
+
     def jouer(self) :
 
         print(self.grille)
         print("Bienvenue dans cette partie de démineur !\nPour commencer, choisi une case ou creuser. Pour cela, chaque action se décompose en 3 :\n\t- Une lettre pour l'action : C pour creuser et D pour poser un drapeau\n\t- Un nombre pour la ligne à laquelle effectuer l'action\n\t- Un nombre pour la colonne à laquelle effectuer l'action\nPar exemple, 'C 12 5' creuse la case située à la 12eme ligne et 5eme colonne !\n")
         reponse = self.question(premier=True)
-        self.grille = Grille(self.longueur, self.largeur, self.nbMines, reponse[1], reponse[2])
+        self.grille = Grille(self.longueur, self.largeur, self.nbMines, reponse[1], reponse[2], self.couleur)
         self.casesRestantes()
 
-        while (not self.perdu) and (self.caseCachees != self.nbDrapeau) :
+        while not self.fin() :
             print(self.grille)
             action, ligne, colonne = self.question()
 
             if action in ["C", "c"] :
-                explosion = self.grille.creuser((ligne, colonne))
-                if explosion : 
-                    self.perdu = True
-
+                self.creuser(ligne, colonne)
 
             else :
-                if self.nbDrapeau == 0 :
-                    if self.grille[ligne, colonne].etat == 0 :
-                        print("Plus aucun drapeau n'est disponible.")
-                    else :
-                        self.nbDrapeau += self.grille.placerDrapeau((ligne, colonne))
-                else : 
-                    self.nbDrapeau += self.grille.placerDrapeau((ligne, colonne))
+                self.drapeau(ligne, colonne)
 
             self.casesRestantes()
             
