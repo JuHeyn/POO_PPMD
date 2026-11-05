@@ -7,13 +7,13 @@ from Grille import Grille
 
 class Interface(QWidget) :
 
-    def __init__(self, d=Demineur(10,15,40, couleur=False)):
+    def __init__(self, d=Demineur(20,30,100, couleur=False)):
         self.tailleCase = 20
         self.demineur = d
         self.nouvellePartie = True
         QWidget.__init__(self)
         self.setWindowTitle("Partie de démineur")
-        self.setFixedSize((self.tailleCase + 2)*d.largeur, (self.tailleCase + 2)*d.longueur + 40)
+        self.setFixedSize((self.tailleCase + 2)*d.largeur, (self.tailleCase + 2)*d.longueur + 60)
 
         self.grilleBouton = [[QPushButton(str(d.grille[l,c])) for c in range(d.largeur)] for l in range(d.longueur)]
         self.grilleLayout = QVBoxLayout()
@@ -25,12 +25,17 @@ class Interface(QWidget) :
         self.labelDrapeau.setText(f"{self.demineur.nbDrapeau} ⚑")
         ligneLayout.addWidget(self.labelDrapeau)
 
+        boutonRejouer = QPushButton("Recommencer")
+        boutonRejouer.clicked.connect(self.rejouer)
+        ligneLayout.addWidget(boutonRejouer)
+
         self.labelTemps = QLabel(informations)
         self.labelTemps.setText("00:00:00")
         self.labelTemps.setAlignment(Qt.AlignRight)
         ligneLayout.addWidget(self.labelTemps)
 
         self.timer = QTimer()
+        self.timer.timeout.connect(self.chaqueSeconde)
         self.temps = QTime(0, 0, 0)
 
         self.grilleLayout.addLayout(ligneLayout)
@@ -42,13 +47,37 @@ class Interface(QWidget) :
                 self.grilleBouton[l][c].clicked.connect(lambda _, ligne=l, colonne=c : self.creuser(ligne, colonne))
                 self.grilleBouton[l][c].customContextMenuRequested.connect(lambda _, ligne=l, colonne=c : self.drapeau(ligne, colonne))
                 self.grilleBouton[l][c].setFixedSize(self.tailleCase, self.tailleCase)
-                # self.grilleBouton[l][c].setStyleSheet("background-color: #00FF00; color: #00FF00;")
                 ligneLayout.addWidget(self.grilleBouton[l][c])
                 
             self.grilleLayout.addLayout(ligneLayout)
 
+        ligneLayout = QHBoxLayout()
+        self.labelAnnonce = QLabel(informations)
+        self.labelAnnonce.setText("")
+        self.labelAnnonce.setAlignment(Qt.AlignCenter)
+        ligneLayout.addWidget(self.labelAnnonce)
+        self.grilleLayout.addLayout(ligneLayout)
 
         self.setLayout(self.grilleLayout)
+
+    def rejouer(self) :
+        self.nouvellePartie = True
+        self.demineur.grille = Grille(self.demineur.longueur, self.demineur.largeur, 0, -1, -1, False)
+        for l in range(self.demineur.longueur) :
+            for c in range(self.demineur.largeur) :
+                self.grilleBouton[l][c].setEnabled(True)
+                self.grilleBouton[l][c].setStyleSheet("")
+
+        self.actualiserGrille()
+
+        self.demineur.nbDrapeau = self.demineur.nbMines
+        self.timer.stop()
+        self.temps = QTime(0, 0, 0)
+        self.demineur.perdu = False
+        self.labelTemps.setText("00:00:00")
+        self.labelDrapeau.setText(f"{self.demineur.nbDrapeau} ⚑")
+        self.labelAnnonce.setText("")
+
 
     def chaqueSeconde(self):
         self.temps = self.temps.addSecs(1)
@@ -58,7 +87,6 @@ class Interface(QWidget) :
         if self.nouvellePartie :
             self.nouvellePartie = False
             self.demineur.grille = Grille(self.demineur.longueur, self.demineur.largeur, self.demineur.nbMines, l, c, False)
-            self.timer.timeout.connect(lambda : self.chaqueSeconde())
             self.timer.start(1000)
 
         else :
@@ -95,14 +123,12 @@ class Interface(QWidget) :
         if self.demineur.perdu :
             self.demineur.grille.reveler(False)
             self.actualiserGrille()
-            print("\nDommage tu as perdu !\n\n")
+            self.labelAnnonce.setText("Dommage, tu as perdu ...")
 
         else :
             self.demineur.grille.reveler(True)
             self.actualiserGrille()
-            print("\nFélicitation tu as gagné cette partie !\n\n")
-        
-
+            self.labelAnnonce.setText("Bravo ! Tu as gagné cette partie !")
         
 
     def actualiserGrille(self) :
