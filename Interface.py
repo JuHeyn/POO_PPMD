@@ -1,13 +1,13 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QLabel
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer, QTime
 
 from Demineur import Demineur
 from Grille import Grille
 
 class Interface(QWidget) :
 
-    def __init__(self, d=Demineur(10,15,100, couleur=False)):
+    def __init__(self, d=Demineur(10,15,40, couleur=False)):
         self.tailleCase = 20
         self.demineur = d
         self.nouvellePartie = True
@@ -17,7 +17,23 @@ class Interface(QWidget) :
 
         self.grilleBouton = [[QPushButton(str(d.grille[l,c])) for c in range(d.largeur)] for l in range(d.longueur)]
         self.grilleLayout = QVBoxLayout()
-        
+
+        ligneLayout = QHBoxLayout()
+        informations = QWidget()
+
+        self.labelDrapeau = QLabel(informations)
+        self.labelDrapeau.setText(f"{self.demineur.nbDrapeau} ⚑")
+        ligneLayout.addWidget(self.labelDrapeau)
+
+        self.labelTemps = QLabel(informations)
+        self.labelTemps.setText("00:00:00")
+        self.labelTemps.setAlignment(Qt.AlignRight)
+        ligneLayout.addWidget(self.labelTemps)
+
+        self.timer = QTimer()
+        self.temps = QTime(0, 0, 0)
+
+        self.grilleLayout.addLayout(ligneLayout)
 
         for l in range(d.longueur) :
             ligneLayout = QHBoxLayout()
@@ -34,11 +50,17 @@ class Interface(QWidget) :
 
         self.setLayout(self.grilleLayout)
 
+    def chaqueSeconde(self):
+        self.temps = self.temps.addSecs(1)
+        jeu.labelTemps.setText(self.temps.toString("hh:mm:ss"))
 
     def creuser(self, l, c) :
         if self.nouvellePartie :
             self.nouvellePartie = False
             self.demineur.grille = Grille(self.demineur.longueur, self.demineur.largeur, self.demineur.nbMines, l, c, False)
+            self.timer.timeout.connect(lambda : self.chaqueSeconde())
+            self.timer.start(1000)
+
         else :
             self.demineur.creuser(l, c)
             
@@ -57,6 +79,7 @@ class Interface(QWidget) :
         else :
             self.demineur.drapeau(l, c)
         self.demineur.casesRestantes()
+        self.labelDrapeau.setText(f"{self.demineur.nbDrapeau} ⚑")
 
         if self.demineur.fin() :
             self.fin()
@@ -66,7 +89,9 @@ class Interface(QWidget) :
 
 
     def fin(self) :
-        
+
+        self.timer.stop()
+
         if self.demineur.perdu :
             self.demineur.grille.reveler(False)
             self.actualiserGrille()
