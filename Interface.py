@@ -91,7 +91,7 @@ class Interface(QWidget) :
     def fin(self) :
 
         self.timer.stop()
-
+        
         if self.demineur.perdu :
             self.demineur.grille.reveler(False)
             self.actualiserGrille()
