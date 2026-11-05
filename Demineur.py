@@ -105,14 +105,16 @@ class Demineur() :
             
 
         
-        self.grille.reveler()
-        print(self.grille)
+        
 
         if self.perdu :
+            self.grille.reveler(False)
+            print(self.grille)
             print("\nDommage tu as perdu !\n\n")
 
         else :
-            
+            self.grille.reveler(True)
+            print(self.grille)
             print("\nFélicitation tu as gagné cette partie !\n\n")
 
 

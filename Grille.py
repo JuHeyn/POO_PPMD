@@ -126,10 +126,12 @@ class Grille() :
                 self.creuser(v)
             return False
 
-    def reveler(self) :
+    def reveler(self, victoire) :
         for l in self.grille :
             for case in l :
-                if case.etat == 0 :
+                if case.etat == 0 and case.bombe and victoire :
+                    case.etat = 1
+                elif case.etat == 0 :
                     case.creuser()
 
 

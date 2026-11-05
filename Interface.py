@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QHBoxLayout, QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt
 
 from Demineur import Demineur
@@ -7,15 +7,17 @@ from Grille import Grille
 
 class Interface(QWidget) :
 
-    def __init__(self, d=Demineur(5,8,3, couleur=False)):
+    def __init__(self, d=Demineur(10,15,100, couleur=False)):
+        self.tailleCase = 20
         self.demineur = d
         self.nouvellePartie = True
         QWidget.__init__(self)
         self.setWindowTitle("Partie de démineur")
-        self.setFixedSize(55*d.largeur, 55*d.longueur)
+        self.setFixedSize((self.tailleCase + 2)*d.largeur, (self.tailleCase + 2)*d.longueur + 40)
 
         self.grilleBouton = [[QPushButton(str(d.grille[l,c])) for c in range(d.largeur)] for l in range(d.longueur)]
         self.grilleLayout = QVBoxLayout()
+        
 
         for l in range(d.longueur) :
             ligneLayout = QHBoxLayout()
@@ -23,7 +25,8 @@ class Interface(QWidget) :
                 self.grilleBouton[l][c].setContextMenuPolicy(Qt.CustomContextMenu)
                 self.grilleBouton[l][c].clicked.connect(lambda _, ligne=l, colonne=c : self.creuser(ligne, colonne))
                 self.grilleBouton[l][c].customContextMenuRequested.connect(lambda _, ligne=l, colonne=c : self.drapeau(ligne, colonne))
-                self.grilleBouton[l][c].setFixedSize(50, 50)
+                self.grilleBouton[l][c].setFixedSize(self.tailleCase, self.tailleCase)
+                # self.grilleBouton[l][c].setStyleSheet("background-color: #00FF00; color: #00FF00;")
                 ligneLayout.addWidget(self.grilleBouton[l][c])
                 
             self.grilleLayout.addLayout(ligneLayout)
@@ -63,20 +66,45 @@ class Interface(QWidget) :
 
 
     def fin(self) :
-        self.demineur.grille.reveler()
-        self.actualiserGrille()
+        
         if self.demineur.perdu :
+            self.demineur.grille.reveler(False)
+            self.actualiserGrille()
             print("\nDommage tu as perdu !\n\n")
 
         else :
+            self.demineur.grille.reveler(True)
+            self.actualiserGrille()
             print("\nFélicitation tu as gagné cette partie !\n\n")
+        
 
         
 
     def actualiserGrille(self) :
+        dicoCouleur = {0 : '#7DCF4A',
+                       1 : '#85B541',
+                       2 : '#8C9B38',
+                       3 : '#94812E',
+                       4 : '#9B6825',
+                       5 : '#A34E1C',
+                       6 : '#AA3413',
+                       7 : '#B21A09',
+                       8 : '#B90000'}
+        
         for l in range(self.demineur.longueur) :
             for c in range(self.demineur.largeur) :
-                self.grilleBouton[l][c].setText(str(self.demineur.grille[l,c]))
+                case = self.demineur.grille[l,c]
+                self.grilleBouton[l][c].setText(str(case))
+                if case.etat == -1 and case.bombe :
+                    self.grilleBouton[l][c].setEnabled(False)
+                    self.grilleBouton[l][c].setStyleSheet("background-color: #FF0000; color: #000000;")
+                elif case.etat == -1 :
+                    self.grilleBouton[l][c].setEnabled(False)
+                    self.grilleBouton[l][c].setStyleSheet(f"color: {dicoCouleur[case.valeur]};")
+                elif case.etat == 1 and self.demineur.fin() :
+                    self.grilleBouton[l][c].setEnabled(False)
+                    self.grilleBouton[l][c].setStyleSheet(f"background-color: {"#7DCF4A" if case.bombe else "#FF8800"}; color: #000000;")
+
 
 
 
