@@ -6,22 +6,21 @@ class Grille() :
     def __init__(self, longueur, largeur, nbMines, ligneDepart, colonneDepart, couleur = True) :
         if nbMines >= largeur * longueur - 9 :
             raise Exception("La grille possède trop de mines")
-        self.long = longueur
-        self.larg = largeur
-        self.mines = nbMines
+        self.longueur = longueur
+        self.largeur = largeur
         self.couleur = couleur
 
-        self.grille = [[Case(l, c, False, self.couleur) for c in range(self.larg)] for l in range(self.long)]
+        self.grille = [[Case(l, c, False, self.couleur) for c in range(self.largeur)] for l in range(self.longueur)]
         minesRestantes = nbMines
 
         if (ligneDepart, colonneDepart) == (-1, -1) :
             pass
-        elif not (0 <= ligneDepart < self.long) or not (0 <= colonneDepart < self.larg) :
+        elif not (0 <= ligneDepart < self.longueur) or not (0 <= colonneDepart < self.largeur) :
             raise IndexError("La case de démarrage n'est pas dans la grille.")
         else :
             environ = self.voisinage(ligneDepart,colonneDepart)
             while minesRestantes > 0 :
-                l, c = randint(0, self.long-1), randint(0, self.larg-1)
+                l, c = randint(0, self.longueur-1), randint(0, self.largeur-1)
                 if not self[l,c].bombe and (l,c) not in environ and (l,c) != (ligneDepart, colonneDepart):
                     self[l,c].bombe = True
                     minesRestantes -= 1 
@@ -38,27 +37,27 @@ class Grille() :
             try :
                 return self.grille[key]
             except IndexError :
-                raise IndexError(f"La ligne recherchée n'existe pas : ligne d'indice {key} dans {self.larg} lignes")
+                raise IndexError(f"La ligne recherchée n'existe pas : ligne d'indice {key} dans {self.largeur} lignes")
             
         elif type(key) == tuple and len(key) == 2 :
             try :
                 return self.grille[key[0]][key[1]]
             except IndexError :
-                raise IndexError(f"La case recherchée n'existe pas : case d'indice {key} dans {self.long}x{self.larg}")
+                raise IndexError(f"La case recherchée n'existe pas : case d'indice {key} dans {self.longueur}x{self.largeur}")
 
         elif type(key) == Case :
             return Case
 
 
     def __str__(self):
-        ligne = "    " + "----" * self.larg + "-\n"
+        ligne = "    " + "----" * self.largeur + "-\n"
         affichage = "    "
-        for j in range(self.larg) :
+        for j in range(self.largeur) :
             affichage += f" {" "*(3-len(str(j+1))) + str(j+1)}"
 
         affichage += "\n" + ligne + "  1 | "
-        for i in range(self.long) :
-            for j in range(self.larg) :
+        for i in range(self.longueur) :
+            for j in range(self.largeur) :
                 affichage += str(self[i,j]) + " | "
             affichage += "\n" + ligne + f"{" "*(3-len(str(i+2))) + str(i+2)} | "
 
@@ -66,27 +65,27 @@ class Grille() :
 
     def voisinage(self, l, c) :
         # Centre
-        if 0 < l < self.long -1 and 0 < c < self.larg -1 :
+        if 0 < l < self.longueur -1 and 0 < c < self.largeur -1 :
             return [(l-1, c-1), (l-1, c), (l-1, c+1), (l, c-1), (l, c+1), (l+1, c-1), (l+1, c), (l+1, c+1)]
 
         # Cotes
-        elif l == 0 and 0 < c < self.larg -1 :
+        elif l == 0 and 0 < c < self.largeur -1 :
             return [(l, c-1), (l, c+1), (l+1, c-1), (l+1, c), (l+1, c+1)]
-        elif l == self.long-1 and 0 < c < self.larg -1 :
+        elif l == self.longueur-1 and 0 < c < self.largeur -1 :
             return [(l-1, c-1), (l-1, c), (l-1, c+1), (l, c-1), (l, c+1)]
-        elif 0 < l < self.long -1 and c == 0 :
+        elif 0 < l < self.longueur -1 and c == 0 :
             return [(l-1, c), (l-1, c+1), (l, c+1), (l+1, c), (l+1, c+1)]
-        elif 0 < l < self.long -1 and c == self.larg -1 :
+        elif 0 < l < self.longueur -1 and c == self.largeur -1 :
             return [(l-1, c-1), (l-1, c), (l, c-1), (l+1, c-1), (l+1, c)]
 
         # Coins
         elif l == 0 and c == 0 :
             return [(l, c+1), (l+1, c), (l+1, c+1)]
-        elif l == self.long -1 and c == 0 :
+        elif l == self.longueur -1 and c == 0 :
             return [(l-1, c), (l-1, c+1), (l, c+1)]
-        elif l == 0 and c == self.larg -1 :
+        elif l == 0 and c == self.largeur -1 :
             return [(l, c-1), (l+1, c-1), (l+1, c)]
-        elif l == self.long -1 and c == self.larg -1 :
+        elif l == self.longueur -1 and c == self.largeur -1 :
             return [(l-1, c-1), (l-1, c), (l, c-1)]
 
 

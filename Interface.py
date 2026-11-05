@@ -7,15 +7,15 @@ from Grille import Grille
 
 class Interface(QWidget) :
 
-    def __init__(self, d=Demineur(20,30,100, couleur=False)):
+    def __init__(self, longueur = 20, largeur = 20, nbMines = 70):
         self.tailleCase = 20
-        self.demineur = d
+        self.demineur = Demineur(longueur, largeur, nbMines, False)
         self.nouvellePartie = True
         QWidget.__init__(self)
         self.setWindowTitle("Partie de démineur")
-        self.setFixedSize((self.tailleCase + 2)*d.largeur, (self.tailleCase + 2)*d.longueur + 60)
+        self.setFixedSize((self.tailleCase + 2)*largeur, (self.tailleCase + 2)*longueur + 60)
 
-        self.grilleBouton = [[QPushButton(str(d.grille[l,c])) for c in range(d.largeur)] for l in range(d.longueur)]
+        self.grilleBouton = [[QPushButton(str(self.demineur.grille[l,c])) for c in range(largeur)] for l in range(longueur)]
         self.grilleLayout = QVBoxLayout()
 
         ligneLayout = QHBoxLayout()
@@ -40,9 +40,9 @@ class Interface(QWidget) :
 
         self.grilleLayout.addLayout(ligneLayout)
 
-        for l in range(d.longueur) :
+        for l in range(longueur) :
             ligneLayout = QHBoxLayout()
-            for c in range(d.largeur) :
+            for c in range(largeur) :
                 self.grilleBouton[l][c].setContextMenuPolicy(Qt.CustomContextMenu)
                 self.grilleBouton[l][c].clicked.connect(lambda _, ligne=l, colonne=c : self.creuser(ligne, colonne))
                 self.grilleBouton[l][c].customContextMenuRequested.connect(lambda _, ligne=l, colonne=c : self.drapeau(ligne, colonne))
