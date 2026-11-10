@@ -21,7 +21,7 @@ class Interface(QWidget) :
         self.nouvellePartie = True
 
         QWidget.__init__(self)
-        self.setWindowTitle("Partie de démineur")
+        self.setWindowTitle("Démineur - Partie en cours")
         self.setFixedSize((self.tailleCase + 2)*largeur, (self.tailleCase + 2)*longueur + 60)
 
         self.grilleBouton = [[QPushButton(str(self.demineur.grille[l,c])) for c in range(largeur)] for l in range(longueur)]
@@ -108,7 +108,7 @@ class Interface(QWidget) :
         Permet de mettre à jour le minuteur chaque seconde.
         """
         self.temps = self.temps.addSecs(1)
-        jeu.labelTemps.setText(self.temps.toString("hh:mm:ss"))
+        self.labelTemps.setText(self.temps.toString("hh:mm:ss"))
 
     def creuser(self, l, c) :
         """
@@ -201,8 +201,6 @@ class Interface(QWidget) :
                 elif case.etat == 1 and self.demineur.fin() :
                     self.grilleBouton[l][c].setEnabled(False)
                     self.grilleBouton[l][c].setStyleSheet(f"background-color: {"#7DCF4A" if case.bombe else "#FF8800"}; color: #000000;")
-
-
 
 
 if __name__ == "__main__" :
