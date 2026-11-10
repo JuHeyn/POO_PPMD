@@ -118,9 +118,10 @@ class Demineur() :
             ligne (int): Indice de la ligne de la case à creuser.
             colonne (int): Indice de la colonne de la case à creuser.
         """
-        explosion = self.grille.creuser((ligne, colonne))
-        if explosion : 
-            self.perdu = True
+        if self.grille[ligne,colonne].etat != 1 :
+            explosion = self.grille.creuser((ligne, colonne))
+            if explosion : 
+                self.perdu = True
 
 
     def drapeau(self, ligne, colonne) :
