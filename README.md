@@ -55,4 +55,10 @@ Pour lancer depuis le selecteur de niveau, il suffit d'executer le fichier [Choi
 
 
 ---
+
+### Analyse
+L'analyse est présente dans le dossier Analyse.
+
+---
+
 Jules Heyndels - PPMD ING24 - 2026
