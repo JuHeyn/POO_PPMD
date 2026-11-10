@@ -30,6 +30,18 @@ class Demineur() :
 
         self.grille = Grille(self.longueur, self.largeur, 0, -1, -1, self.couleur)
 
+    @classmethod
+    def facile(cls) :
+        return cls(longueur = 8, largeur = 10, nbMines= 10)
+
+    @classmethod
+    def moyen(cls) :
+        return cls(longueur = 14, largeur = 18, nbMines = 40)
+
+    @classmethod
+    def difficile(cls) :
+        return cls(longueur = 20, largeur = 24, nbMines = 99)
+
 
     def question(self, premier = False) :
         """
@@ -177,5 +189,6 @@ class Demineur() :
 
 
 if __name__ == "__main__" :
-    d = Demineur(4,3,1)
+    # d = Demineur(4,3,1)
+    d = Demineur.facile()
     d.jouer()

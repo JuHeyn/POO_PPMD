@@ -69,6 +69,18 @@ class Interface(QWidget) :
 
         self.setLayout(self.grilleLayout)
 
+    @classmethod
+    def facile(cls) :
+        return cls(longueur = 8, largeur = 10, nbMines= 10)
+
+    @classmethod
+    def moyen(cls) :
+        return cls(longueur = 14, largeur = 18, nbMines = 40)
+
+    @classmethod
+    def difficile(cls) :
+        return cls(longueur = 20, largeur = 24, nbMines = 99)
+
     def rejouer(self) :
         """
         Permet de remttre à zéro la grille et les constantes de jeu.
@@ -199,7 +211,7 @@ if __name__ == "__main__" :
     if not app:
         app = QApplication(sys.argv)
 
-    jeu = Interface()
+    jeu = Interface.difficile()
     jeu.show()
 
     app.exec_()
