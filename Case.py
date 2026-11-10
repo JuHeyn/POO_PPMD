@@ -1,6 +1,15 @@
 class Case() :
 
     def __init__(self, ligne:int, colonne:int, bombe:bool, couleur = True) :
+        """
+        Création d'un objet de la classe Case.
+
+        Args:
+            ligne (int): Indice de la ligne sur laquelle est située la case.
+            colonne (int): Indice de la colonne sur laquelle est située de la case.
+            bombe (bool): Une bombe est présente sur la case.
+            couleur (bool, optional): Affichage des couleurs lors du print. Defaults to True.
+        """
         self.ligne = ligne
         self.colonne = colonne
         self.bombe = bombe
@@ -8,6 +17,7 @@ class Case() :
         self.valeur = 0
         self.zeros = []
         self.couleur = couleur
+
 
     def __str__(self):
         if self.bombe :
@@ -21,9 +31,13 @@ class Case() :
 
         return dicoEtats[self.etat]
 
+
     def placerDrapeau(self) :
         """
-        Place ou enlève un drapeau sur la case
+        Place ou enlève un drapeau sur la case.
+
+        Returns:
+            int : Incrémentation du nombre de drapeau.
         """
         if self.etat == 0 :
             self.etat = 1
@@ -36,6 +50,12 @@ class Case() :
 
 
     def creuser(self) :
+        """
+        Creuse la case actuelle et révèle sa valeur, ou la mine.
+
+        Returns:
+            bool : Découverte de la mine.
+        """
         self.etat = -1
         if self.bombe :
             return True

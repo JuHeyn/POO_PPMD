@@ -8,9 +8,18 @@ from Grille import Grille
 class Interface(QWidget) :
 
     def __init__(self, longueur = 20, largeur = 20, nbMines = 70):
+        """
+        Création d'un objet d'interface de jeu de démineur.
+
+        Args:
+            longueur (int, optional): Nombre de ligne du démineur. Defaults to 20.
+            largeur (int, optional): Nombre de colonne du démineur. Defaults to 20.
+            nbMines (int, optional): Nombre de mines du démineur. Defaults to 70.
+        """
         self.tailleCase = 20
         self.demineur = Demineur(longueur, largeur, nbMines, False)
         self.nouvellePartie = True
+
         QWidget.__init__(self)
         self.setWindowTitle("Partie de démineur")
         self.setFixedSize((self.tailleCase + 2)*largeur, (self.tailleCase + 2)*longueur + 60)
@@ -61,6 +70,9 @@ class Interface(QWidget) :
         self.setLayout(self.grilleLayout)
 
     def rejouer(self) :
+        """
+        Permet de remttre à zéro la grille et les constantes de jeu.
+        """
         self.nouvellePartie = True
         self.demineur.grille = Grille(self.demineur.longueur, self.demineur.largeur, 0, -1, -1, False)
         for l in range(self.demineur.longueur) :
@@ -80,10 +92,20 @@ class Interface(QWidget) :
 
 
     def chaqueSeconde(self):
+        """
+        Permet de mettre à jour le minuteur chaque seconde.
+        """
         self.temps = self.temps.addSecs(1)
         jeu.labelTemps.setText(self.temps.toString("hh:mm:ss"))
 
     def creuser(self, l, c) :
+        """
+        Creuse la case sélectionnée avec vérification de fin de partie.
+
+        Args:
+            l (int): Indice de la lgine de la case à creuser.
+            c (int): Indice de la colonne de la case à creuser.
+        """
         if self.nouvellePartie :
             self.nouvellePartie = False
             self.demineur.grille = Grille(self.demineur.longueur, self.demineur.largeur, self.demineur.nbMines, l, c, False)
@@ -102,6 +124,13 @@ class Interface(QWidget) :
 
 
     def drapeau(self, l, c) :
+        """
+        Place un drapeau sur la case sélectionnée avec vérification de fin de partie.
+
+        Args:
+            l (int): Indice de la ligne de la case sur laquelle poser le drapeau.
+            c (int): Indice de la colonne de la case sur laquelle poser le drapeau.
+        """
         if self.nouvellePartie :
             pass
         else :
@@ -117,7 +146,9 @@ class Interface(QWidget) :
 
 
     def fin(self) :
-
+        """
+        Fin de partie, arret du minuteur et bloquage de la grille.
+        """
         self.timer.stop()
         
         if self.demineur.perdu :
@@ -132,6 +163,9 @@ class Interface(QWidget) :
         
 
     def actualiserGrille(self) :
+        """
+        Mise à jour des valeurs affichées dans la grille (découverte de cases).
+        """
         dicoCouleur = {0 : '#7DCF4A',
                        1 : '#85B541',
                        2 : '#8C9B38',
